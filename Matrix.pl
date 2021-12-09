@@ -86,7 +86,7 @@ goalHelper1(_, _, R):- R \= depth_limit_exceeded.
 
 goalHelper1(Limit, S, depth_limit_exceeded):-
 	call_with_depth_limit(once(goalHelper2(S)),Limit,R),
-	New_Limit is Limit + 100,
+	New_Limit is Limit + 10,
 	goalHelper1(New_Limit,S,R).
   
 goalHelper2(State):-
