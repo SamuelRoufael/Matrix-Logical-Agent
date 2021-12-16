@@ -63,19 +63,13 @@ solve(Neo, Capacity, Hostages, result(Action, State)) :-
 	(
 		Action = drop,
 		atBooth(Neo),
-		capacity(Capacity),
+		capacity(Capacity),	
 		(
-			% Neo Carried Hostages, as he reached his maximum capacity
-			solve(Neo, 0, Hostages, State);
-			
-			% Neo Carried all Hostages in the grid but still has room for more Hostages to carry.
-			(
-				hostages_loc(AllHostages),
-				length(AllHostages, N),
-				C1 is Capacity - N,
-				C1 > 0,
-				solve(Neo, C1, Hostages, State)
-			)
+			hostages_loc(AllHostages),
+			length(AllHostages, N),
+			(CapacityPrev is 0; CapacityPrev is 1; CapacityPrev is Capacity - N + 1; CapacityPrev is Capacity - N),
+			CapacityPrev >= 0,
+			solve(Neo, CapacityPrev, Hostages, State)
 		)
 	).
 
