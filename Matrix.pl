@@ -73,6 +73,7 @@ solve(Neo, Capacity, Hostages, result(Action, State)) :-
 				hostages_loc(AllHostages),
 				length(AllHostages, N),
 				C1 is Capacity - N,
+				C1 > 0,
 				solve(Neo, C1, Hostages, State)
 			)
 		)
