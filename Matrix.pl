@@ -29,19 +29,22 @@ atBooth([NeoX, NeoY]) :-
 % -------------------------- Successor State Axioms -------------------------
 % ---------------------------------------------------------------------------
 
-% ------------------------------ Initial State ------------------------------
+% ------------------------ Initial State & Base Case ------------------------
+
 solve([NeoX, NeoY], Capacity, Hostages, s0) :-
 	capacity(Capacity),
 	neo_loc(NeoX, NeoY),
 	hostages_loc(Hostages).
+
+% ------------------------ Intermediate States ------------------------------
 
 solve(Neo, Capacity, Hostages, result(Action, State)) :-
 	
 	% ------ Change Position ------
 	(
 		(Action = up; Action = down; Action = right; Action = left),
+		\+ isBorder(Neo),
 		move(Action, NeoPrev, Neo),
-		\+ isBorder(NeoPrev),
 		solve(NeoPrev, Capacity, Hostages, State)
 	);
 			
@@ -61,7 +64,18 @@ solve(Neo, Capacity, Hostages, result(Action, State)) :-
 		Action = drop,
 		atBooth(Neo),
 		capacity(Capacity),
-		solve(Neo, 0, Hostages, State)
+		(
+			% Neo Carried Hostages, as he reached his maximum capacity
+			solve(Neo, 0, Hostages, State);
+			
+			% Neo Carried all Hostages in the grid but still has room for more Hostages to carry.
+			(
+				hostages_loc(AllHostages),
+				length(AllHostages, N),
+				C1 is Capacity - N,
+				solve(Neo, C1, Hostages, State)
+			)
+		)
 	).
 
 % -----------------------------------------------------------------------------
@@ -70,7 +84,7 @@ goalHelper1(_, _, R):- R \= depth_limit_exceeded.
 
 goalHelper1(Limit, S, depth_limit_exceeded):-
 	call_with_depth_limit(once(goalHelper2(S)),Limit,R),
-	New_Limit is Limit + 1000,
+	New_Limit is Limit + 1,
 	goalHelper1(New_Limit,S,R).
   
 goalHelper2(State):-
